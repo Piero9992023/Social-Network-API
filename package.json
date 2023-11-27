@@ -1,14 +1,15 @@
 {
-  "name": "Solved",
+  "name": "Social-Network-API",
   "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
+  "main": "server.js",
+  "license": "None",
   "scripts": {
-    "start": "node index",
+    "start": "node server.js",
     "seed": "node utils/seed"
   },
   "dependencies": {
     "express": "^4.17.1",
-    "mongoose": "^7.0.2"
+    "mongoose": "^7.0.2",
+    "validator": "^13.11.0"
   }
 }
