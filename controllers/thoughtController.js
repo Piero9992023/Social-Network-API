@@ -49,7 +49,7 @@ const thoughtController = {
     async updateThought(req, res) {
         try {
             const thought = await Thought.findOneAndUpdate(
-                { _id: res.params.thoughtId},
+                { _id: req.params.thoughtId},
                 { $set: req.body },
                 { runValidators: true, new: true }
             );
@@ -64,19 +64,29 @@ const thoughtController = {
         }
     },
 
-    // Deleting Thought with associated reactions
+    // Deleting Thought 
     async deleteThought(req, res) {
         try {
-            const thought = await Thought.findOneAndDelete( 
-                { _id: req.body.thoughtId}
+            const thought = await Thought.findOneAndDelete(
+                { _id: req.body.thoughtId }
             );
-
-            if(!thought) {
-                return res.status(404).json({ message: "No thought withi this ID"})
+    
+            if (!thought) {
+                return res.status(404).json({ message: "No thought with this ID" });
             }
-
-            return res.status(200).json({ message: "Thought successfully deleted with their associated reactions"});
-        } catch(err) {
+    
+            const updatedUser = await User.findOneAndUpdate(
+                { thoughts: req.body.thoughtId },
+                { $pull: { thoughts: req.body.thoughtId } },
+                { new : true }
+            );
+    
+            if (!updatedUser) {
+                return res.status(404).json({ message: "No user with this thought ID" });
+            }
+    
+            return res.status(200).json({ message: "Thought successfully deleted" });
+        } catch (err) {
             return res.status(500).json(err);
         }
     },
@@ -100,7 +110,7 @@ const thoughtController = {
         }
     },
 
-    //Deleting Raeaction
+    //Deleting Reaction
     async deleteReaction(req, res) {
         try {
             const reaction = await Thought.findOneAndUpdate(

@@ -46,7 +46,7 @@ const userController = {
         try {
             const newUserData = await User.findOneAndUpdate(
 
-                { _id: res.params.userId },
+                { _id: req.params.userId },
                 { $set: req.body },
                 { runValidators: true, new: true }
 
