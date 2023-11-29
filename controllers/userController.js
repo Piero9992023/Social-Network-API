@@ -72,7 +72,7 @@ const userController = {
                 return res.status(404).json(user);
             }
 
-            await User.deleteMany({_id: {$in: user.thoughts} });
+            await Thought.deleteMany({_id: {$in: user.thoughts} });
 
             return res.status(200).json({message: "User and associated thoughts were successfully deleted"})
         } catch(err) {
