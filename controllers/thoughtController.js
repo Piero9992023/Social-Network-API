@@ -32,13 +32,18 @@ const thoughtController = {
         try {
             const thought = await Thought.create(req.body);
 
-            const user = await User.findByIdAndUpdate(
-                req.body.userId,
-                { $addToSet: { thoughts: thought._id} },
-                { runValidators: true, new: true }
+            const user = await User.findOneAndUpdate(
+                { _id: req.body.userId },
+                { $push: { thoughts: thought._id} },
+                { new: true }
             );
 
-            return res.status(200).json({ thought, user });
+            if(!user) {
+                return res.status(404).json({
+                    message: 'Thought created, but no user found with this ID'
+                });
+            }
+            return res.status(200).json({ message: 'Created the Thought Successfully 🎉' });
         } catch(err) {
             return res.status(500).json(err);
         }
@@ -67,23 +72,23 @@ const thoughtController = {
     // Deleting Thought 
     async deleteThought(req, res) {
         try {
-            const thought = await Thought.findOneAndDelete(
-                { _id: req.body.thoughtId }
+            const thought = await Thought.findOneAndRemove(
+                { _id: req.params.thoughtId }
             );
     
             if (!thought) {
-                return res.status(404).json({ message: "No thought with this ID" });
-            }
+                return res.status(404).json({ message: "No thought with this ID found" });
+            };
     
             const updatedUser = await User.findOneAndUpdate(
-                { thoughts: req.body.thoughtId },
-                { $pull: { thoughts: req.body.thoughtId } },
+                { thoughts: req.params.thoughtId },
+                { $pull: { thoughts: req.params.thoughtId } },
                 { new : true }
             );
     
             if (!updatedUser) {
-                return res.status(404).json({ message: "No user with this thought ID" });
-            }
+                return res.status(404).json({ message: "Thought deleted but no user found with this ID" });
+            };
     
             return res.status(200).json({ message: "Thought successfully deleted" });
         } catch (err) {
